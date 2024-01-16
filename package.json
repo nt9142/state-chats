@@ -2,11 +2,12 @@
   "name": "state-chats",
   "version": "0.0.1-preview",
   "description": "A package for creating chatbots based on JSON schemas.",
-  "main": "index.js",
+  "main": "dist/index.js",
   "types": "index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "prepublish": "npm run build"
   },
   "keywords": [
     "chat",

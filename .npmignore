@@ -1,0 +1,5 @@
+node_modules
+src
+*.test.ts
+.eslintrc.js
+.prettierrc.json

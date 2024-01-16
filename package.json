@@ -41,5 +41,10 @@
   },
   "peerDependencies": {
     "react": ">16.8.0"
+  },
+  "release": {
+    "branches": [
+      "main"
+    ]
   }
 }

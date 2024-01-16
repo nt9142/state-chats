@@ -1,0 +1,1 @@
+export { getChat } from './core';

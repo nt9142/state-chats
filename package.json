@@ -1,6 +1,6 @@
 {
   "name": "state-chats",
-  "version": "0.0.1-preview1",
+  "version": "0.0.1",
   "description": "A package for creating chatbots based on JSON schemas.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",

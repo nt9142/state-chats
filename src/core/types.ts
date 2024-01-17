@@ -1,7 +1,6 @@
 import type { Condition } from './conditions/types';
 
 export type * from './conditions/types';
-export type { GetChatOptions } from './index';
 
 /**
  * Represents a chat script.
@@ -48,3 +47,31 @@ export type ChatMessageWithVariable<TMeta = any> = BaseChatMessage<TMeta> & {
 export type ChatMessage<TMeta = any> =
   | ChatMessageWithDelay<TMeta>
   | ChatMessageWithVariable<TMeta>;
+
+export type ChatEvent =
+  | 'message'
+  | 'prompt'
+  | 'send'
+  | 'start'
+  | 'stop'
+  | 'error'
+  | 'finish';
+
+export type MessageHandler<TAnswers> = (
+  messageObject: ChatMessage,
+  answers: TAnswers,
+) => void;
+export type PromptHandler = (messageObject: ChatMessage) => void;
+export type FinishHandler = (answers: Record<string, any>) => void;
+export type SimpleHandler = () => void;
+export type ErrorHandler = (error: Error) => void;
+
+export type ChatEventHandlerMap<TAnswers> = {
+  message: MessageHandler<TAnswers>;
+  prompt: PromptHandler;
+  finish: FinishHandler;
+  error: ErrorHandler;
+  start: SimpleHandler;
+  stop: SimpleHandler;
+  send: SimpleHandler;
+};

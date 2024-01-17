@@ -74,8 +74,11 @@ module.exports = {
     '@typescript-eslint/space-before-function-paren': 'off',
     '@typescript-eslint/strict-boolean-expressions': 'off',
     '@typescript-eslint/consistent-type-definitions': 'off',
+    '@typescript-eslint/consistent-type-assertions': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
     'no-async-promise-executor': 'off',
     '@typescript-eslint/explicit-function-return-type': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
+    'generator-star-spacing': 'off',
   },
 };

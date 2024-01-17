@@ -48,5 +48,12 @@
     "branches": [
       "main"
     ]
+  },
+  "exports": {
+    ".": "./dist/index.js",
+    "./types": "./dist/types.d.ts"
+  },
+  "dependencies": {
+    "eventemitter3": "^5.0.1"
   }
 }

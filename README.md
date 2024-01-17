@@ -98,4 +98,4 @@ Contributions are welcome! Please read our [Contributing Guide](CONTRIBUTING.md)
 
 ## License
 
-State-Chats is [MIT licensed](LICENSE).
+State-Chats is [MIT licensed](LICENSE.md).

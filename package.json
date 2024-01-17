@@ -17,7 +17,7 @@
     "chatbot"
   ],
   "author": "Nik Barabanov <nt9142@gmail.com>",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/nt9142/state-chats/issues"
   },

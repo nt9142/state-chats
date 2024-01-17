@@ -1,9 +1,12 @@
 import type { Condition } from './conditions/types';
 
+export type * from './conditions/types';
+export type { GetChatOptions } from './index';
+
 /**
  * Represents a chat script.
  */
-export type ChatScript<TMeta = any> = ChatMessage<TMeta>[];
+export type ChatScript<TMeta = any> = Array<ChatMessage<TMeta>>;
 
 /**
  * Represents the base structure of a chat message.

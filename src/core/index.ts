@@ -5,26 +5,20 @@ import type {
   ChatScript,
 } from './types';
 import { evaluateCondition } from './conditions/utils';
+import { processContent } from './utils';
 
-export function processContent(
-  content: string,
-  answers: { [key: string]: string },
-): string {
-  return content.replace(/\{\{(\w+)\}\}/g, (_, key) => answers[key] || '');
-}
-
-type GetChatOptions<TMeta> = {
+export interface GetChatOptions<TMeta> {
   script: ChatScript<TMeta>;
   showMessage: (messageText: string, message: ChatMessage<TMeta>) => void;
   promptInput: (meta: TMeta) => Promise<string>;
-};
-export function getChat<TMeta = any>({
+}
+export async function getChat<TMeta = any>({
   script,
   showMessage,
   promptInput,
-}: GetChatOptions<TMeta>): Promise<{ [key: string]: string }> {
-  return new Promise(async (resolve) => {
-    const answers = {} as { [key: string]: string };
+}: GetChatOptions<TMeta>): Promise<Record<string, string>> {
+  return await new Promise(async (resolve) => {
+    const answers: Record<string, string> = {};
     for (const message of script) {
       // Check if the message should be shown based on the condition
       if (message.condition && !evaluateCondition(message.condition, answers)) {

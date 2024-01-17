@@ -1,14 +1,5 @@
-import { processContent, getChat } from '../index';
-import { ChatScript } from '../types';
-
-describe('processContent', () => {
-  it('should return processed content', () => {
-    const content = 'Hello, {{name}}!';
-    const answers = { name: 'John' };
-    const processedContent = processContent(content, answers);
-    expect(processedContent).toBe('Hello, John!');
-  });
-});
+import { getChat } from '../index';
+import type { ChatScript } from '../types';
 
 describe('getChat', () => {
   it('should return answers from the chat script', async () => {
@@ -26,7 +17,7 @@ describe('getChat', () => {
     const answers = await getChat({
       script,
       showMessage: jest.fn(),
-      promptInput: jest.fn(() => Promise.resolve('John')),
+      promptInput: jest.fn(async () => await Promise.resolve('John')),
     });
 
     expect(answers).toEqual({ name: 'John' });
@@ -56,7 +47,7 @@ describe('getChat', () => {
     const answers = await getChat({
       script,
       showMessage: jest.fn(),
-      promptInput: jest.fn(() => Promise.resolve('John')),
+      promptInput: jest.fn(async () => await Promise.resolve('John')),
     });
 
     expect(answers).toEqual({ name: 'John' });
@@ -78,7 +69,7 @@ describe('getChat', () => {
       },
     ];
 
-    const promptInput = jest.fn(() => Promise.resolve('John'));
+    const promptInput = jest.fn(async () => await Promise.resolve('John'));
     const chatPromise = getChat({
       script,
       showMessage: jest.fn(),

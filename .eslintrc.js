@@ -10,7 +10,7 @@ module.exports = {
       env: {
         node: true,
       },
-      files: ['*.ts'],
+      files: ['./src/**/*.ts'],
       parserOptions: {
         sourceType: 'script',
         project: './tsconfig.json',
@@ -76,5 +76,6 @@ module.exports = {
     '@typescript-eslint/consistent-type-definitions': 'off',
     '@typescript-eslint/no-misused-promises': 'off',
     'no-async-promise-executor': 'off',
+    '@typescript-eslint/explicit-function-return-type': 'off',
   },
 };

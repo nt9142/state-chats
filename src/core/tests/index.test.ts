@@ -32,12 +32,12 @@ describe('getChat', () => {
     chat.start();
 
     expect(onMessage).toHaveBeenCalledTimes(1);
-    expect(onMessage).toHaveBeenCalledWith(script[0], {});
+    expect(onMessage).toHaveBeenCalledWith(script[0], {}, undefined);
 
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     expect(onMessage).toHaveBeenCalledTimes(2);
-    expect(onMessage).toHaveBeenCalledWith(script[1], {});
+    expect(onMessage).toHaveBeenCalledWith(script[1], {}, undefined);
 
     expect(onPromptInput).toHaveBeenCalledTimes(1);
 
@@ -49,9 +49,13 @@ describe('getChat', () => {
 
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(onMessage).toHaveBeenCalledWith(script[2], {
-      name: 'John',
-    });
+    expect(onMessage).toHaveBeenCalledWith(
+      script[2],
+      {
+        name: 'John',
+      },
+      undefined,
+    );
 
     chat.stop();
   });

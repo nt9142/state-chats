@@ -8,22 +8,33 @@ import type {
   ChatScript,
 } from './types';
 import { evaluateCondition } from './conditions/utils';
+import { type ActionMap } from './actions/types';
+import { getHasAction } from './utils';
 
 export function getChat<
   TMeta = any,
   TAnswers extends Record<string, any> = Record<string, string>,
->(script: ChatScript<TMeta>) {
+  TAction extends string = never,
+>(script: ChatScript<TMeta>, actions?: ActionMap<TAction, TAnswers>) {
   const chatEmitter = new EventEmitter<ChatEvent>();
   let isRunning = false;
   let chatIterator: AsyncGenerator;
   let answers = {} as TAnswers;
+  let prefetchResult: unknown;
 
   async function* chatGenerator() {
     for (const message of script) {
       if (message.condition && !evaluateCondition(message.condition, answers)) {
         continue;
       }
-      chatEmitter.emit('message', message, answers);
+
+      // Execute prefetch if it exists
+      if (actions && getHasAction(message.prefetch, actions)) {
+        prefetchResult = await actions[message.prefetch](answers, message);
+      }
+
+      chatEmitter.emit('message', message, answers, prefetchResult);
+
       if ((message as ChatMessageWithDelay<TMeta>).delay) {
         await new Promise((resolve) =>
           setTimeout(resolve, (message as ChatMessageWithDelay<TMeta>).delay),
@@ -74,7 +85,7 @@ export function getChat<
 
   function onEvent<K extends ChatEvent>(
     event: K,
-    listener: ChatEventHandlerMap<TAnswers>[K],
+    listener: ChatEventHandlerMap<TAnswers, TAction>[K],
   ): void {
     chatEmitter.on(event, listener);
   }

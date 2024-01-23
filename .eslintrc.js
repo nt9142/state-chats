@@ -80,5 +80,6 @@ module.exports = {
     '@typescript-eslint/explicit-function-return-type': 'off',
     '@typescript-eslint/no-floating-promises': 'off',
     'generator-star-spacing': 'off',
+    '@typescript-eslint/indent': 'off',
   },
 };

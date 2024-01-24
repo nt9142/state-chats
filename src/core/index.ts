@@ -1,8 +1,11 @@
 import EventEmitter from 'eventemitter3';
+import { v4 as uuidv4 } from 'uuid';
 
 import type {
   ChatEvent,
   ChatEventHandlerMap,
+  ChatMessage,
+  ChatMessageActionResultMap,
   ChatMessageWithDelay,
   ChatMessageWithVariable,
   ChatScript,
@@ -14,26 +17,43 @@ import { getHasAction } from './utils';
 export function getChat<
   TMeta = any,
   TAnswers extends Record<string, any> = Record<string, string>,
-  TAction extends string = never,
+  TAction extends string = string,
 >(script: ChatScript<TMeta>, actions?: ActionMap<TAction, TAnswers>) {
   const chatEmitter = new EventEmitter<ChatEvent>();
   let isRunning = false;
   let chatIterator: AsyncGenerator;
   let answers = {} as TAnswers;
-  let prefetchResult: unknown;
+  let actionResultMap: ChatMessageActionResultMap<TAction> = {};
 
   async function* chatGenerator() {
-    for (const message of script) {
-      if (message.condition && !evaluateCondition(message.condition, answers)) {
+    for (const messageCreate of script) {
+      if (
+        messageCreate.condition &&
+        !evaluateCondition(messageCreate.condition, answers)
+      ) {
         continue;
       }
 
+      const message = {
+        id: uuidv4(),
+        ...messageCreate,
+      } as ChatMessage<TMeta, TAction>;
+
+      actionResultMap[message.id] = {};
+
       // Execute prefetch if it exists
       if (actions && getHasAction(message.prefetch, actions)) {
-        prefetchResult = await actions[message.prefetch](answers, message);
+        try {
+          actionResultMap[message.id].prefetch = await actions[
+            message.prefetch
+          ](answers, message);
+        } catch (error) {
+          chatEmitter.emit('error', error);
+          continue;
+        }
       }
 
-      chatEmitter.emit('message', message, answers, prefetchResult);
+      chatEmitter.emit('message', message, answers, actionResultMap);
 
       if ((message as ChatMessageWithDelay<TMeta>).delay) {
         await new Promise((resolve) =>
@@ -54,6 +74,7 @@ export function getChat<
     if (!isRunning) {
       isRunning = true;
       answers = {} as TAnswers;
+      actionResultMap = {} as ChatMessageActionResultMap<TAction>;
       chatIterator = chatGenerator();
       chatEmitter.emit('start');
       let result = await chatIterator.next();

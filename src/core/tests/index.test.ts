@@ -32,12 +32,20 @@ describe('getChat', () => {
     chat.start();
 
     expect(onMessage).toHaveBeenCalledTimes(1);
-    expect(onMessage).toHaveBeenCalledWith(script[0], {}, undefined);
+    expect(onMessage).toHaveBeenCalledWith(
+      expect.objectContaining(script[0]),
+      {},
+      expect.objectContaining({}),
+    );
 
     await new Promise((resolve) => setTimeout(resolve, 10));
 
     expect(onMessage).toHaveBeenCalledTimes(2);
-    expect(onMessage).toHaveBeenCalledWith(script[1], {}, undefined);
+    expect(onMessage).toHaveBeenCalledWith(
+      expect.objectContaining(script[1]),
+      {},
+      expect.objectContaining({}),
+    );
 
     expect(onPromptInput).toHaveBeenCalledTimes(1);
 
@@ -50,11 +58,11 @@ describe('getChat', () => {
     await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(onMessage).toHaveBeenCalledWith(
-      script[2],
+      expect.objectContaining(script[2]),
       {
         name: 'John',
       },
-      undefined,
+      expect.objectContaining({}),
     );
 
     chat.stop();

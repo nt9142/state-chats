@@ -49,7 +49,7 @@ export type ChatMessageActions<TAction extends string> = {
 };
 
 export type ChatMessageActionResults<TAction extends string> = Partial<
-  Record<keyof ChatMessageActions<TAction>, unknown>
+  Record<keyof ChatMessageActions<TAction>, any>
 >;
 
 export type ChatMessageActionResultMap<TAction extends string> = Record<
@@ -119,7 +119,7 @@ export type ChatEvent =
 export type MessageHandler<TAnswers, TAction extends string> = (
   messageObject: ChatMessage,
   answers: TAnswers,
-  actionResults: Record<TAction, unknown>,
+  actionResults: Record<TAction, any>,
 ) => void;
 export type PromptHandler = (messageObject: ChatMessage) => void;
 export type FinishHandler = (answers: Record<string, any>) => void;

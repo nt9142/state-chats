@@ -21,7 +21,7 @@ export function useStateChat<
   messages: Array<ChatMessage<TMeta, TAction>>;
   send?: (value: any) => void;
   answers: TAnswers;
-  actionResult: ChatMessageActionResultMap<TAction>;
+  actionResultMap: ChatMessageActionResultMap<TAction>;
   isFinished: boolean;
   current: {
     message: ChatMessage<TMeta, TAction>;
@@ -78,7 +78,7 @@ export function useStateChat<
     send,
     answers,
     isFinished,
-    actionResult: actionResultMap,
+    actionResultMap,
     current,
   };
 }

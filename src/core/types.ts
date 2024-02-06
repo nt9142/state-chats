@@ -48,6 +48,11 @@ export type ChatMessageActions<TAction extends string> = {
   prefetch?: TAction;
 };
 
+/**
+ * Represents the action results of a chat message.
+ */
+export type SupportedChatMessageActions = 'prefetch';
+
 export type ChatMessageActionResults<TAction extends string> = Partial<
   Record<keyof ChatMessageActions<TAction>, any>
 >;

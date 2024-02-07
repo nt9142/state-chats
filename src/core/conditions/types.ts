@@ -21,8 +21,15 @@ export type AndOrCondition = {
   conditions: Condition[]; // An array of Condition for 'and' or 'or' type
 };
 
+export type LengthCondition = {
+  type: 'lengthAtLeast' | 'lengthAtMost' | 'lengthEquals';
+  variable: string;
+  value: number; // The length to compare against
+};
+
 export type Condition =
   | EqualsCondition
   | ContainsCondition
   | NotCondition
-  | AndOrCondition;
+  | AndOrCondition
+  | LengthCondition;

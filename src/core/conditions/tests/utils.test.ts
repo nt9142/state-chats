@@ -114,3 +114,61 @@ describe('evaluateCondition', () => {
     expect(result).toBe(false);
   });
 });
+
+describe('evaluateCondition with array extensions', () => {
+  const answers = {
+    list1: [1, 2, 3, 4],
+    list2: ['a', 'b', 'c'],
+    list3: ['hello', 'world'],
+  };
+
+  it('should return true for lengthAtLeast condition when array length meets the minimum requirement', () => {
+    const condition: Condition = {
+      type: 'lengthAtLeast',
+      variable: 'list1',
+      value: 4,
+    };
+    const result = evaluateCondition(condition, answers);
+    expect(result).toBe(true);
+  });
+
+  it('should return false for lengthAtLeast condition when array length does not meet the minimum requirement', () => {
+    const condition: Condition = {
+      type: 'lengthAtLeast',
+      variable: 'list2',
+      value: 4,
+    };
+    const result = evaluateCondition(condition, answers);
+    expect(result).toBe(false);
+  });
+
+  it('should return true for lengthAtMost condition when array length meets the maximum requirement', () => {
+    const condition: Condition = {
+      type: 'lengthAtMost',
+      variable: 'list1',
+      value: 4,
+    };
+    const result = evaluateCondition(condition, answers);
+    expect(result).toBe(true);
+  });
+
+  it('should return false for lengthAtMost condition when array length exceeds the maximum requirement', () => {
+    const condition: Condition = {
+      type: 'lengthAtMost',
+      variable: 'list1',
+      value: 3,
+    };
+    const result = evaluateCondition(condition, answers);
+    expect(result).toBe(false);
+  });
+
+  it('should return true for lengthEquals condition when array length matches the specified value', () => {
+    const condition: Condition = {
+      type: 'lengthEquals',
+      variable: 'list3',
+      value: 2,
+    };
+    const result = evaluateCondition(condition, answers);
+    expect(result).toBe(true);
+  });
+});

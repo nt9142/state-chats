@@ -22,6 +22,21 @@ export function evaluateCondition(condition: Condition, answers: any): boolean {
       );
     case 'not':
       return !evaluateCondition(condition.condition, answers);
+    case 'lengthAtLeast':
+      return (
+        Array.isArray(answers[condition.variable]) &&
+        answers[condition.variable].length >= condition.value
+      );
+    case 'lengthAtMost':
+      return (
+        Array.isArray(answers[condition.variable]) &&
+        answers[condition.variable].length <= condition.value
+      );
+    case 'lengthEquals':
+      return (
+        Array.isArray(answers[condition.variable]) &&
+        answers[condition.variable].length === condition.value
+      );
     default:
       throw new Error(`Unsupported condition type: ${(condition as any).type}`);
   }

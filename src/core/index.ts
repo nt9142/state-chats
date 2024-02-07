@@ -5,31 +5,29 @@ import type {
   ChatEvent,
   ChatEventHandlerMap,
   ChatMessage,
-  ChatMessageActionResultMap,
   ChatMessageWithDelay,
   ChatMessageWithVariable,
   ChatScript,
 } from './types';
 import { evaluateCondition } from './conditions/utils';
 import { type ActionMap } from './actions/types';
-import { getHasAction } from './utils';
+import { executeAction, getHasAction } from './utils';
 
 export function getChat<
+  TContext extends Record<string, any> = Record<string, string>,
+  TActionKey extends string = string,
   TMeta = any,
-  TAnswers extends Record<string, any> = Record<string, string>,
-  TAction extends string = string,
->(script: ChatScript<TMeta>, actions?: ActionMap<TAction, TAnswers>) {
+>(script: ChatScript<TMeta>, actions?: ActionMap<TActionKey, TContext>) {
   const chatEmitter = new EventEmitter<ChatEvent>();
   let isRunning = false;
   let chatIterator: AsyncGenerator;
-  let answers = {} as TAnswers;
-  let actionResultMap: ChatMessageActionResultMap<TAction> = {};
+  let context = {} as TContext;
 
   async function* chatGenerator() {
     for (const messageCreate of script) {
       if (
         messageCreate.condition &&
-        !evaluateCondition(messageCreate.condition, answers)
+        !evaluateCondition(messageCreate.condition, context)
       ) {
         continue;
       }
@@ -37,23 +35,20 @@ export function getChat<
       const message = {
         id: uuidv4(),
         ...messageCreate,
-      } as ChatMessage<TMeta, TAction>;
-
-      actionResultMap[message.id] = {};
+      } as ChatMessage<TMeta, TActionKey>;
 
       // Execute prefetch if it exists
-      if (actions && getHasAction(message.prefetch, actions)) {
+      if (actions && getHasAction(message.prefetch?.actionKey, actions)) {
         try {
-          actionResultMap[message.id].prefetch = await actions[
-            message.prefetch
-          ](answers, message);
+          (context as Record<string, any>)[message.prefetch.contextKey] =
+            await executeAction(message.prefetch, actions, context, message);
         } catch (error) {
           chatEmitter.emit('error', error);
           continue;
         }
       }
 
-      chatEmitter.emit('message', message, answers, actionResultMap);
+      chatEmitter.emit('message', message, { ...context });
 
       if ((message as ChatMessageWithDelay<TMeta>).delay) {
         await new Promise((resolve) =>
@@ -62,19 +57,28 @@ export function getChat<
       }
       if ((message as ChatMessageWithVariable<TMeta>).variable) {
         const answer: string = yield message as ChatMessageWithVariable<TMeta>;
-        (answers as Record<string, any>)[
+        (context as Record<string, any>)[
           (message as ChatMessageWithVariable<TMeta>).variable
         ] = answer;
       }
+
+      if (actions && getHasAction(message.postfetch?.actionKey, actions)) {
+        try {
+          (context as Record<string, any>)[message.postfetch.contextKey] =
+            await executeAction(message.postfetch, actions, context, message);
+        } catch (error) {
+          chatEmitter.emit('error', error);
+          continue;
+        }
+      }
     }
-    return answers;
+    return context;
   }
 
   async function startChat() {
     if (!isRunning) {
       isRunning = true;
-      answers = {} as TAnswers;
-      actionResultMap = {} as ChatMessageActionResultMap<TAction>;
+      context = {} as TContext;
       chatIterator = chatGenerator();
       chatEmitter.emit('start');
       let result = await chatIterator.next();
@@ -83,7 +87,7 @@ export function getChat<
         const answer = await listenToPrompt();
         result = await chatIterator.next(answer);
       }
-      chatEmitter.emit('finish', answers);
+      chatEmitter.emit('finish', context);
     }
   }
 
@@ -106,7 +110,7 @@ export function getChat<
 
   function onEvent<K extends ChatEvent>(
     event: K,
-    listener: ChatEventHandlerMap<TAnswers, TAction>[K],
+    listener: ChatEventHandlerMap<TContext>[K],
   ): void {
     chatEmitter.on(event, listener);
   }

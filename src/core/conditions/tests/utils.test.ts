@@ -2,7 +2,7 @@ import type { Condition } from '../types';
 import { evaluateCondition } from '../utils';
 
 describe('evaluateCondition', () => {
-  const answers = {
+  const context = {
     variable1: 'value1',
     variable2: 'value2',
     variable3: 'value4',
@@ -14,7 +14,7 @@ describe('evaluateCondition', () => {
       variable: 'variable1',
       value: 'value1',
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(true);
   });
 
@@ -24,7 +24,7 @@ describe('evaluateCondition', () => {
       variable: 'variable1',
       value: 'value2',
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(false);
   });
 
@@ -34,7 +34,7 @@ describe('evaluateCondition', () => {
       variable: 'variable2',
       value: 'val',
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(true);
   });
 
@@ -44,7 +44,7 @@ describe('evaluateCondition', () => {
       variable: 'variable2',
       value: 'value4',
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(false);
   });
 
@@ -56,7 +56,7 @@ describe('evaluateCondition', () => {
         { type: 'contains', variable: 'variable2', value: 'value2' },
       ],
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(true);
   });
 
@@ -68,7 +68,7 @@ describe('evaluateCondition', () => {
         { type: 'equals', variable: 'variable2', value: 'value3' },
       ],
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(false);
   });
 
@@ -80,7 +80,7 @@ describe('evaluateCondition', () => {
         { type: 'equals', variable: 'variable2', value: 'value2' },
       ],
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(true);
   });
 
@@ -92,7 +92,7 @@ describe('evaluateCondition', () => {
         { type: 'contains', variable: 'variable2', value: 'value4' },
       ],
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(false);
   });
 
@@ -101,7 +101,7 @@ describe('evaluateCondition', () => {
       type: 'not',
       condition: { type: 'equals', variable: 'variable1', value: 'value2' },
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(true);
   });
 
@@ -110,13 +110,13 @@ describe('evaluateCondition', () => {
       type: 'not',
       condition: { type: 'equals', variable: 'variable1', value: 'value1' },
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(false);
   });
 });
 
 describe('evaluateCondition with array extensions', () => {
-  const answers = {
+  const context = {
     list1: [1, 2, 3, 4],
     list2: ['a', 'b', 'c'],
     list3: ['hello', 'world'],
@@ -128,7 +128,7 @@ describe('evaluateCondition with array extensions', () => {
       variable: 'list1',
       value: 4,
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(true);
   });
 
@@ -138,7 +138,7 @@ describe('evaluateCondition with array extensions', () => {
       variable: 'list2',
       value: 4,
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(false);
   });
 
@@ -148,7 +148,7 @@ describe('evaluateCondition with array extensions', () => {
       variable: 'list1',
       value: 4,
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(true);
   });
 
@@ -158,7 +158,7 @@ describe('evaluateCondition with array extensions', () => {
       variable: 'list1',
       value: 3,
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(false);
   });
 
@@ -168,7 +168,7 @@ describe('evaluateCondition with array extensions', () => {
       variable: 'list3',
       value: 2,
     };
-    const result = evaluateCondition(condition, answers);
+    const result = evaluateCondition(condition, context);
     expect(result).toBe(true);
   });
 });

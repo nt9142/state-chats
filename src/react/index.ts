@@ -1,55 +1,48 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import {
-  type ChatMessageActionResultMap,
   type ActionMap,
   type ChatMessage,
   type ChatScript,
-  type ChatMessageActionResults,
   type ChatMessageWithVariable,
 } from '../core/types';
 import { getChat } from '../core';
 
 export function useStateChat<
+  TContext extends Record<string, any>,
+  TActionKey extends string,
   TMeta,
-  TAction extends string,
-  TAnswers extends Record<string, any>,
 >(
-  script: ChatScript<TMeta, TAction>,
-  actions?: ActionMap<TAction, TAnswers>,
+  script: ChatScript<TMeta, TActionKey>,
+  actions?: ActionMap<TActionKey, TContext>,
 ): {
-  messages: Array<ChatMessage<TMeta, TAction>>;
+  messages: Array<ChatMessage<TMeta, TActionKey>>;
   send?: (value: any) => void;
-  answers: TAnswers;
-  actionResultMap: ChatMessageActionResultMap<TAction>;
+  context: TContext;
   isFinished: boolean;
-  current: {
-    message: ChatMessage<TMeta, TAction>;
-    actionResult: ChatMessageActionResults<TAction>;
-  } | null;
+  current: ChatMessage<TMeta, TActionKey> | null;
 } {
-  const chat = useMemo(() => getChat(script, actions), [script, actions]);
-  const [messages, setMessages] = useState<Array<ChatMessage<TMeta, TAction>>>(
-    [],
+  const chat = useMemo(
+    () => getChat<TContext, TActionKey, TMeta>(script, actions),
+    [script, actions],
   );
-  const [answers, setAnswers] = useState<TAnswers>({} as TAnswers);
-  const [actionResultMap, setActionResultMap] = useState<
-    ChatMessageActionResultMap<TAction>
-  >({});
+  const [messages, setMessages] = useState<
+    Array<ChatMessage<TMeta, TActionKey>>
+  >([]);
+  const [context, setContext] = useState<TContext>({} as TContext);
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {
-    chat.on('message', (message, newAnswers, actionResultMap) => {
-      setActionResultMap(actionResultMap);
+    chat.on('message', (message, newContext) => {
       setMessages((messages) => [
         ...messages,
-        message as ChatMessage<TMeta, TAction>,
+        message as ChatMessage<TMeta, TActionKey>,
       ]);
-      setAnswers((answers) => ({ ...answers, ...newAnswers }));
+      setContext((context) => ({ ...context, ...newContext }));
     });
 
-    chat.on('finish', (newAnswers) => {
-      setAnswers((answers) => ({ ...answers, ...newAnswers }));
+    chat.on('finish', (newContext) => {
+      setContext((context) => ({ ...context, ...newContext }));
       setIsFinished(true);
     });
 
@@ -61,12 +54,7 @@ export function useStateChat<
   }, [chat]);
 
   const currentMessage = messages[messages.length - 1];
-  const current = currentMessage
-    ? {
-        message: currentMessage,
-        actionResult: actionResultMap[messages[messages.length - 1].id],
-      }
-    : null;
+  const current = currentMessage || null;
 
   const send =
     (currentMessage as ChatMessageWithVariable)?.variable !== undefined
@@ -76,9 +64,8 @@ export function useStateChat<
   return {
     messages,
     send,
-    answers,
+    context,
     isFinished,
-    actionResultMap,
     current,
   };
 }

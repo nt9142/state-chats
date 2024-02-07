@@ -7,14 +7,14 @@ export type * from './actions/types';
 /**
  * Represents a chat script.
  */
-export type ChatScript<TMeta = any, TAction extends string = string> = Array<
-  ChatMessageCreate<TMeta, TAction>
+export type ChatScript<TMeta = any, TActionKey extends string = string> = Array<
+  ChatMessageCreate<TMeta, TActionKey>
 >;
 
 /**
  * Represents the base structure of a chat message.
  */
-type BaseChatMessage<TMeta, TAction extends string> = {
+type BaseChatMessage<TMeta, TActionKey extends string> = {
   /**
    * The unique identifier of the message.
    */
@@ -36,39 +36,40 @@ type BaseChatMessage<TMeta, TAction extends string> = {
    * For example, you can store options for a multiple choice question.
    */
   meta?: TMeta;
-} & ChatMessageActions<TAction>;
+} & ChatMessageActions<TActionKey>;
+
+export type ActionObject<TActionKey extends string> = {
+  actionKey: TActionKey;
+  contextKey: string;
+};
 
 /**
  * Represents the actions of a chat message.
  */
-export type ChatMessageActions<TAction extends string> = {
+export type ChatMessageActions<TActionKey extends string> = {
   /**
    * The action to execute before the message is shown.
    */
-  prefetch?: TAction;
+  prefetch?: ActionObject<TActionKey>;
+
+  /**
+   * The action to execute after the message is shown.
+   */
+  postfetch?: ActionObject<TActionKey>;
 };
 
 /**
- * Represents the action results of a chat message.
+ * Represents the supported chat message actions.
  */
-export type SupportedChatMessageActions = 'prefetch';
-
-export type ChatMessageActionResults<TAction extends string> = Partial<
-  Record<keyof ChatMessageActions<TAction>, any>
->;
-
-export type ChatMessageActionResultMap<TAction extends string> = Record<
-  string,
-  ChatMessageActionResults<TAction>
->;
+export type SupportedChatMessageActions = 'prefetch' | 'postfetch';
 
 /**
  * Represents a chat message with a delay.
  */
 export type ChatMessageWithDelay<
   TMeta = any,
-  TAction extends string = string,
-> = BaseChatMessage<TMeta, TAction> & {
+  TActionKey extends string = string,
+> = BaseChatMessage<TMeta, TActionKey> & {
   delay: number;
 };
 
@@ -77,40 +78,43 @@ export type ChatMessageWithDelay<
  */
 export type ChatMessageWithVariable<
   TMeta = any,
-  TAction extends string = string,
-> = BaseChatMessage<TMeta, TAction> & {
+  TActionKey extends string = string,
+> = BaseChatMessage<TMeta, TActionKey> & {
   variable: string;
 };
 
 /**
  * Represents a chat message.
  */
-export type ChatMessage<TMeta = any, TAction extends string = string> =
-  | ChatMessageWithDelay<TMeta, TAction>
-  | ChatMessageWithVariable<TMeta, TAction>;
+export type ChatMessage<TMeta = any, TActionKey extends string = string> =
+  | ChatMessageWithDelay<TMeta, TActionKey>
+  | ChatMessageWithVariable<TMeta, TActionKey>;
 
 /**
  * Represents a chat message with a delay that can be created.
  */
 export type ChatMessageWithDelayCreate<
   TMeta = any,
-  TAction extends string = string,
-> = Omit<ChatMessageWithDelay<TMeta, TAction>, 'id'>;
+  TActionKey extends string = string,
+> = Omit<ChatMessageWithDelay<TMeta, TActionKey>, 'id'>;
 
 /**
  * Represents a chat message with a variable that can be created.
  */
 export type ChatMessageWithVariableCreate<
   TMeta = any,
-  TAction extends string = string,
-> = Omit<ChatMessageWithVariable<TMeta, TAction>, 'id'>;
+  TActionKey extends string = string,
+> = Omit<ChatMessageWithVariable<TMeta, TActionKey>, 'id'>;
 
 /**
  * Represents a chat message that can be created.
  */
-export type ChatMessageCreate<TMeta = any, TAction extends string = string> =
-  | ChatMessageWithDelayCreate<TMeta, TAction>
-  | ChatMessageWithVariableCreate<TMeta, TAction>;
+export type ChatMessageCreate<
+  TMeta = any,
+  TActionKey extends string = string,
+> =
+  | ChatMessageWithDelayCreate<TMeta, TActionKey>
+  | ChatMessageWithVariableCreate<TMeta, TActionKey>;
 
 export type ChatEvent =
   | 'message'
@@ -121,18 +125,17 @@ export type ChatEvent =
   | 'error'
   | 'finish';
 
-export type MessageHandler<TAnswers, TAction extends string> = (
+export type MessageHandler<TContext> = (
   messageObject: ChatMessage,
-  answers: TAnswers,
-  actionResults: Record<TAction, any>,
+  context: TContext,
 ) => void;
 export type PromptHandler = (messageObject: ChatMessage) => void;
-export type FinishHandler = (answers: Record<string, any>) => void;
+export type FinishHandler = (context: Record<string, any>) => void;
 export type SimpleHandler = () => void;
 export type ErrorHandler = (error: Error) => void;
 
-export type ChatEventHandlerMap<TAnswers, TAction extends string = string> = {
-  message: MessageHandler<TAnswers, TAction>;
+export type ChatEventHandlerMap<TContext> = {
+  message: MessageHandler<TContext>;
   prompt: PromptHandler;
   finish: FinishHandler;
   error: ErrorHandler;

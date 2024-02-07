@@ -1,10 +1,10 @@
 import { type ChatMessage } from '../types';
 
-export type ActionFunction<TAnswers> = (
-  answers: TAnswers,
+export type ActionFunction<TContext> = (
+  context: TContext,
   message: ChatMessage,
 ) => Promise<any>;
 
-export type ActionMap<TAction extends string, TAnswers> = {
-  [key in TAction]: ActionFunction<TAnswers>;
+export type ActionMap<TActionKey extends string, TContext> = {
+  [key in TActionKey]: ActionFunction<TContext>;
 };

@@ -8,6 +8,7 @@ import type {
   ChatMessageWithDelay,
   ChatMessageWithVariable,
   ChatScript,
+  GetChatOptions,
 } from './types';
 import { evaluateCondition } from './conditions/utils';
 import { type ActionMap } from './actions/types';
@@ -17,11 +18,15 @@ export function getChat<
   TContext extends Record<string, any> = Record<string, string>,
   TActionKey extends string = string,
   TMeta = any,
->(script: ChatScript<TMeta>, actions?: ActionMap<TActionKey, TContext>) {
+>(
+  script: ChatScript<TMeta>,
+  actions?: ActionMap<TActionKey, TContext>,
+  options?: GetChatOptions<TContext>,
+) {
   const chatEmitter = new EventEmitter<ChatEvent>();
   let isRunning = false;
   let chatIterator: AsyncGenerator;
-  let context = {} as TContext;
+  let context = options?.initialContext ?? ({} as TContext);
 
   async function* chatGenerator() {
     for (const messageCreate of script) {

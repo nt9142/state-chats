@@ -143,3 +143,10 @@ export type ChatEventHandlerMap<TContext> = {
   stop: SimpleHandler;
   send: SimpleHandler;
 };
+
+/**
+ * Represents getChat options.
+ */
+export type GetChatOptions<TContext> = {
+  initialContext?: TContext;
+};

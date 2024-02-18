@@ -5,6 +5,7 @@ import {
   type ChatMessage,
   type ChatScript,
   type ChatMessageWithVariable,
+  type GetChatOptions,
 } from '../core/types';
 import { getChat } from '../core';
 
@@ -15,6 +16,7 @@ export function useStateChat<
 >(
   script: ChatScript<TMeta, TActionKey>,
   actions?: ActionMap<TActionKey, TContext>,
+  options?: GetChatOptions<TContext>,
 ): {
   messages: Array<ChatMessage<TMeta, TActionKey>>;
   send?: (value: any) => void;
@@ -23,8 +25,8 @@ export function useStateChat<
   current: ChatMessage<TMeta, TActionKey> | null;
 } {
   const chat = useMemo(
-    () => getChat<TContext, TActionKey, TMeta>(script, actions),
-    [script, actions],
+    () => getChat<TContext, TActionKey, TMeta>(script, actions, options),
+    [script, actions, ...Object.values(options ?? {})],
   );
   const [messages, setMessages] = useState<
     Array<ChatMessage<TMeta, TActionKey>>

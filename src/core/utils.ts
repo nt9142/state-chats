@@ -3,7 +3,7 @@ import { type ActionObject, type ChatMessage } from './types';
 
 export function processContent(
   content: string,
-  context: Record<string, string>,
+  context: Record<string, any>,
 ): string {
   return content.replace(/\{\{(\w+)\}\}/g, (_, key) => context[key] || '');
 }

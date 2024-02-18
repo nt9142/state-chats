@@ -83,7 +83,7 @@ export function getChat<
   async function startChat() {
     if (!isRunning) {
       isRunning = true;
-      context = {} as TContext;
+      context = options?.initialContext ?? ({} as TContext);
       chatIterator = chatGenerator();
       chatEmitter.emit('start');
       let result = await chatIterator.next();

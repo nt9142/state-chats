@@ -86,6 +86,7 @@ export type ChatMessageWithVariable<
   TActionKey extends string = string,
 > = BaseChatMessage<TMeta, TActionKey> & {
   variable: string;
+  delayAfterAnswer?: number;
 };
 
 /**

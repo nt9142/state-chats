@@ -78,6 +78,7 @@ describe('getChat', () => {
       {
         content: 'What is your name?',
         variable: 'name',
+        delayAfterAnswer: 2,
         postfetch: {
           contextKey: 'isAdmin',
           actionKey: 'getIsAdmin',
@@ -149,10 +150,9 @@ describe('getChat', () => {
     chat.send('John');
     await new Promise((resolve) => setTimeout(resolve, 0));
 
-    expect(onMessage).toHaveBeenCalledTimes(4);
+    expect(onMessage).toHaveBeenCalledTimes(3);
 
-    expect(onMessage).toHaveBeenNthCalledWith(
-      3,
+    expect(onMessage).toHaveBeenCalledWith(
       expect.objectContaining({
         id: expect.any(String),
         content: 'John',
@@ -162,6 +162,10 @@ describe('getChat', () => {
         name: 'John',
       },
     );
+
+    await new Promise((resolve) => setTimeout(resolve, 5));
+
+    expect(onMessage).toHaveBeenCalledTimes(4);
 
     expect(onMessage).toHaveBeenCalledWith(
       expect.objectContaining(getBotAnswer(script[2])),

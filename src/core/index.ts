@@ -56,16 +56,17 @@ export function getChat<
 
       chatEmitter.emit('message', message, { ...context });
 
-      if ((message as ChatMessageWithDelay<TMeta>).delay) {
+      if (typeof (message as ChatMessageWithDelay<TMeta>).delay === 'number') {
         await new Promise((resolve) =>
           setTimeout(resolve, (message as ChatMessageWithDelay<TMeta>).delay),
         );
       }
+
       if ((message as ChatMessageWithVariable<TMeta>).variable) {
+        const messageWithVariable = message as ChatMessageWithVariable<TMeta>;
         const answer: string = yield message as ChatMessageWithVariable<TMeta>;
-        (context as Record<string, any>)[
-          (message as ChatMessageWithVariable<TMeta>).variable
-        ] = answer;
+
+        (context as Record<string, any>)[messageWithVariable.variable] = answer;
 
         const answerMessage = {
           id: uuidv4(),
@@ -74,6 +75,12 @@ export function getChat<
         } as ChatMessage<TMeta, TActionKey>;
 
         chatEmitter.emit('message', answerMessage, { ...context });
+
+        if (typeof messageWithVariable.delayAfterAnswer === 'number') {
+          await new Promise((resolve) =>
+            setTimeout(resolve, messageWithVariable.delayAfterAnswer),
+          );
+        }
       }
 
       if (actions && getHasAction(message.postfetch?.actionKey, actions)) {

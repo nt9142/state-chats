@@ -1,5 +1,5 @@
 import { getChat } from '..';
-import { type ChatScript } from '../types';
+import { type ChatMessageCreate, type ChatScript } from '../types';
 
 // TODO: Add tests
 describe('getChat', () => {
@@ -63,6 +63,13 @@ describe('getChat', () => {
   });
 
   it('should execute a script with actions', async () => {
+    function getBotAnswer(messageCreate: ChatMessageCreate) {
+      return {
+        id: expect.any(String),
+        role: 'bot',
+        ...messageCreate,
+      };
+    }
     const script: ChatScript<any, 'getIsAdmin' | 'getPermissions'> = [
       {
         content: 'Greetings!',
@@ -125,7 +132,7 @@ describe('getChat', () => {
 
     expect(onMessage).toHaveBeenCalledTimes(1);
     expect(onMessage).toHaveBeenCalledWith(
-      expect.objectContaining(script[0]),
+      expect.objectContaining(getBotAnswer(script[0])),
       {},
     );
 
@@ -133,32 +140,50 @@ describe('getChat', () => {
 
     expect(onMessage).toHaveBeenCalledTimes(2);
     expect(onMessage).toHaveBeenCalledWith(
-      expect.objectContaining(script[1]),
+      expect.objectContaining(getBotAnswer(script[1])),
       {},
     );
 
     expect(onPromptInput).toHaveBeenCalledTimes(1);
 
     chat.send('John');
-
     await new Promise((resolve) => setTimeout(resolve, 0));
-
-    expect(onMessage).toHaveBeenCalledTimes(3);
-    expect(onMessage).toHaveBeenCalledWith(expect.objectContaining(script[2]), {
-      name: 'John',
-      isAdmin: 'Yes',
-      adminPermissions: 'All',
-    });
-
-    await new Promise((resolve) => setTimeout(resolve, 10));
 
     expect(onMessage).toHaveBeenCalledTimes(4);
 
-    expect(onMessage).toHaveBeenCalledWith(expect.objectContaining(script[3]), {
-      name: 'John',
-      isAdmin: 'Yes',
-      adminPermissions: 'All',
-    });
+    expect(onMessage).toHaveBeenNthCalledWith(
+      3,
+      expect.objectContaining({
+        id: expect.any(String),
+        content: 'John',
+        role: 'user',
+      }),
+      {
+        name: 'John',
+      },
+    );
+
+    expect(onMessage).toHaveBeenCalledWith(
+      expect.objectContaining(getBotAnswer(script[2])),
+      {
+        name: 'John',
+        isAdmin: 'Yes',
+        adminPermissions: 'All',
+      },
+    );
+
+    await new Promise((resolve) => setTimeout(resolve, 10));
+
+    expect(onMessage).toHaveBeenCalledTimes(5);
+
+    expect(onMessage).toHaveBeenCalledWith(
+      expect.objectContaining(getBotAnswer(script[3])),
+      {
+        name: 'John',
+        isAdmin: 'Yes',
+        adminPermissions: 'All',
+      },
+    );
 
     chat.stop();
   });

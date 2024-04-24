@@ -21,6 +21,11 @@ type BaseChatMessage<TMeta, TActionKey extends string> = {
   id: string;
 
   /**
+   * The role of the message.
+   */
+  role: 'user' | 'bot';
+
+  /**
    * The text content of the message.
    */
   content: string;
@@ -96,7 +101,7 @@ export type ChatMessage<TMeta = any, TActionKey extends string = string> =
 export type ChatMessageWithDelayCreate<
   TMeta = any,
   TActionKey extends string = string,
-> = Omit<ChatMessageWithDelay<TMeta, TActionKey>, 'id'>;
+> = Omit<ChatMessageWithDelay<TMeta, TActionKey>, 'id' | 'role'>;
 
 /**
  * Represents a chat message with a variable that can be created.
@@ -104,7 +109,7 @@ export type ChatMessageWithDelayCreate<
 export type ChatMessageWithVariableCreate<
   TMeta = any,
   TActionKey extends string = string,
-> = Omit<ChatMessageWithVariable<TMeta, TActionKey>, 'id'>;
+> = Omit<ChatMessageWithVariable<TMeta, TActionKey>, 'id' | 'role'>;
 
 /**
  * Represents a chat message that can be created.

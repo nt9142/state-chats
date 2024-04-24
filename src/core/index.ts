@@ -39,6 +39,7 @@ export function getChat<
 
       const message = {
         id: uuidv4(),
+        role: 'bot',
         ...messageCreate,
       } as ChatMessage<TMeta, TActionKey>;
 
@@ -65,6 +66,14 @@ export function getChat<
         (context as Record<string, any>)[
           (message as ChatMessageWithVariable<TMeta>).variable
         ] = answer;
+
+        const answerMessage = {
+          id: uuidv4(),
+          role: 'user',
+          content: answer,
+        } as ChatMessage<TMeta, TActionKey>;
+
+        chatEmitter.emit('message', answerMessage, { ...context });
       }
 
       if (actions && getHasAction(message.postfetch?.actionKey, actions)) {
@@ -108,7 +117,7 @@ export function getChat<
   }
 
   async function listenToPrompt() {
-    return await new Promise((resolve) => {
+    return await new Promise<string>((resolve) => {
       chatEmitter.once('send', resolve);
     });
   }

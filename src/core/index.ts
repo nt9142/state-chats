@@ -110,14 +110,14 @@ export function getChat<
     chatEmitter.emit('stop');
   }
 
-  function send(message: string) {
+  function send(message: unknown) {
     if (isRunning) {
       chatEmitter.emit('send', message);
     }
   }
 
   async function listenToPrompt() {
-    return await new Promise<string>((resolve) => {
+    return await new Promise<unknown>((resolve) => {
       chatEmitter.once('send', resolve);
     });
   }

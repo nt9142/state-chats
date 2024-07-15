@@ -5,9 +5,9 @@ import {
   type ChatMessage,
   type ChatScript,
   type ChatMessageWithVariable,
-  type GetChatOptions,
 } from '../core/types';
 import { getChat } from '../core';
+import { type UseStateChatOptions } from '../types';
 
 export function useStateChat<
   TContext extends Record<string, any>,
@@ -16,7 +16,7 @@ export function useStateChat<
 >(
   script: ChatScript<TMeta, TActionKey>,
   actions?: ActionMap<TActionKey, TContext>,
-  options?: GetChatOptions<TContext>,
+  options?: UseStateChatOptions<TContext, TMeta, TActionKey>,
 ): {
   messages: Array<ChatMessage<TMeta, TActionKey>>;
   send?: (value: any) => void;
@@ -24,13 +24,42 @@ export function useStateChat<
   isFinished: boolean;
   current: ChatMessage<TMeta, TActionKey> | null;
 } {
-  const chat = useMemo(
-    () => getChat<TContext, TActionKey, TMeta>(script, actions, options),
-    [script, actions, ...Object.values(options ?? {})],
-  );
+  const { initialMessages, ...chatOptions } = options ?? {};
+  const { chatScript, skipEmitFirstMessage } = useMemo(() => {
+    if (!initialMessages) {
+      return {
+        chatScript: script,
+        skipEmitFirstMessage: false,
+      };
+    }
+
+    const alreadySentBotMessages = initialMessages.filter(
+      (m) => m.role === 'bot',
+    );
+
+    if (alreadySentBotMessages.length === 0) {
+      return {
+        chatScript: script,
+        skipEmitFirstMessage: false,
+      };
+    }
+
+    return {
+      chatScript: script.slice(alreadySentBotMessages.length - 1),
+      skipEmitFirstMessage: true,
+    };
+  }, [script]);
+
+  const chat = useMemo(() => {
+    return getChat<TContext, TActionKey, TMeta>(chatScript, actions, {
+      ...chatOptions,
+      skipEmitFirstMessage,
+    });
+  }, [chatScript, actions, chatOptions.initialContext]);
+
   const [messages, setMessages] = useState<
     Array<ChatMessage<TMeta, TActionKey>>
-  >([]);
+  >(initialMessages ?? []);
   const [context, setContext] = useState<TContext>({} as TContext);
   const [isFinished, setIsFinished] = useState(false);
 

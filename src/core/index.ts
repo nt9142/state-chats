@@ -29,7 +29,10 @@ export function getChat<
   let context = options?.initialContext ?? ({} as TContext);
 
   async function* chatGenerator() {
-    for (const messageCreate of script) {
+    for (let i = 0; i < script.length; i += 1) {
+      const messageCreate = script[i];
+      const isFirstMessage = i === 0;
+
       if (
         messageCreate.condition &&
         !evaluateCondition(messageCreate.condition, context)
@@ -54,7 +57,9 @@ export function getChat<
         }
       }
 
-      chatEmitter.emit('message', message, { ...context });
+      if (!isFirstMessage || options?.skipEmitFirstMessage !== true) {
+        chatEmitter.emit('message', message, { ...context });
+      }
 
       if (typeof (message as ChatMessageWithDelay<TMeta>).delay === 'number') {
         await new Promise((resolve) =>

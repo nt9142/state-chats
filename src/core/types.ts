@@ -155,4 +155,5 @@ export type ChatEventHandlerMap<TContext> = {
  */
 export type GetChatOptions<TContext> = {
   initialContext?: TContext;
+  skipEmitFirstMessage?: boolean;
 };

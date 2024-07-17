@@ -25,6 +25,7 @@ export function useStateChat<
   current: ChatMessage<TMeta, TActionKey> | null;
 } {
   const { initialMessages, ...chatOptions } = options ?? {};
+  const { initialContext } = chatOptions;
   const { chatScript, skipEmitFirstMessage } = useMemo(() => {
     if (!initialMessages) {
       return {
@@ -55,12 +56,14 @@ export function useStateChat<
       ...chatOptions,
       skipEmitFirstMessage,
     });
-  }, [chatScript, actions, chatOptions.initialContext]);
+  }, [chatScript, actions, initialContext]);
 
   const [messages, setMessages] = useState<
     Array<ChatMessage<TMeta, TActionKey>>
   >(initialMessages ?? []);
-  const [context, setContext] = useState<TContext>({} as TContext);
+  const [context, setContext] = useState<TContext>(
+    initialContext ?? ({} as TContext),
+  );
   const [isFinished, setIsFinished] = useState(false);
 
   useEffect(() => {

@@ -48,9 +48,16 @@ export function useStateChat<
     const isLastMessageFromBot =
       initialMessages[initialMessages.length - 1].role === 'bot';
 
+    if (isLastMessageFromBot) {
+      return {
+        chatScript: script.slice(alreadySentBotMessages.length - 1),
+        skipEmitFirstMessage: true,
+      };
+    }
+
     return {
-      chatScript: script.slice(alreadySentBotMessages.length - 1),
-      skipEmitFirstMessage: isLastMessageFromBot,
+      chatScript: script.slice(alreadySentBotMessages.length),
+      skipEmitFirstMessage: false,
     };
   }, [script]);
 

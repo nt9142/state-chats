@@ -45,9 +45,12 @@ export function useStateChat<
       };
     }
 
+    const isLastMessageFromBot =
+      initialMessages[initialMessages.length - 1].role === 'bot';
+
     return {
       chatScript: script.slice(alreadySentBotMessages.length - 1),
-      skipEmitFirstMessage: true,
+      skipEmitFirstMessage: isLastMessageFromBot,
     };
   }, [script]);
 
